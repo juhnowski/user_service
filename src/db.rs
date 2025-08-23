@@ -9,6 +9,7 @@ pub enum DbError {
     Sqlx(#[from] sqlx::Error),
 }
 
+#[derive(Clone)]
 pub struct Db {
     pool: MySqlPool,
 }
@@ -31,7 +32,7 @@ impl Db {
         .execute(&self.pool)
         .await?
         .last_insert_id();
-        Ok(id)
+        Ok(id as i64)
     }
 
     pub async fn get_user(&self, id: i64) -> Result<Option<User>, DbError> {
