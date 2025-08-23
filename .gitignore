@@ -1,0 +1,5 @@
+# Rust-specific
+/target/
+
+# vi-specific
+*.swp
