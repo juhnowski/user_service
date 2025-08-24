@@ -7,10 +7,10 @@ use crate::cache::Cache;
 pub async fn create_user(
     db: web::Data<Db>,
     cache: web::Data<Cache>,
-    user: web::Json<User>,
+    mut user: web::Json<User>,
 ) -> impl Responder {
     let id = db.create_user(&user).await.unwrap();
-    cache.set_user(id, &user).await;
+    cache.set_user(id, &mut user).await;
     HttpResponse::Ok().json(json!({ "id": id }))
 }
 
@@ -22,8 +22,8 @@ pub async fn get_user(
     if let Some(user) = cache.get_user(*id).await {
         return HttpResponse::Ok().json(user);
     }
-    if let Some(user) = db.get_user(*id).await.unwrap() {
-        cache.set_user(*id, &user).await;
+    if let Some(mut user) = db.get_user(*id).await.unwrap() {
+        cache.set_user(*id, &mut user).await;
         return HttpResponse::Ok().json(user);
     }
     HttpResponse::NotFound().finish()

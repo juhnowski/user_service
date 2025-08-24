@@ -20,10 +20,11 @@ impl Cache {
         result.map(|s| serde_json::from_str(&s).unwrap())
     }
 
-    pub async fn set_user(&self, id: i64, user: &User) {
+    pub async fn set_user(&self, id: i64, user: &mut User) {
         let mut con = self.client.get_async_connection().await.unwrap();
         let key = format!("user:{}", id);
+        user.id = Some(id);
         let user_json = serde_json::to_string(user).unwrap();
-        con.set::<_, _, ()>(&key, user_json).await.unwrap();
+        con.set::<String, String, ()>(key, user_json).await.unwrap();
     }
 }
